@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lobby Swap</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛎️</text></svg>">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="bell" aria-hidden="true">🛎️</span>
+      <div>
+        <h1>Lobby Swap</h1>
+        <p class="sub">Swap people into a reference video with Higgsfield Genjutsu, over the API.</p>
+      </div>
+    </div>
+    <span id="modeBadge" class="badge">…</span>
+  </header>
+
+  <main class="layout">
+    <form id="form" class="builder" autocomplete="off">
+      <section class="card">
+        <h2><span class="step">1</span> Reference video</h2>
+        <label id="videoDrop" class="drop">
+          <input id="videoInput" type="file" accept="video/mp4" hidden>
+          <div class="drop-empty">
+            <strong>Drop an MP4 here</strong> or click to choose
+            <small>The clip whose motion, camera and setting you want to keep.</small>
+          </div>
+          <video id="videoPreview" class="drop-preview" muted playsinline controls hidden></video>
+        </label>
+        <p id="videoMeta" class="meta"></p>
+        <label id="durationFallback" class="field inline" hidden>
+          <span class="hint">Your browser can't play this file's codec (common with iPhone HEVC clips), so it can't read the length. Enter it to see the price:</span>
+          <input id="durationInput" type="number" min="1" max="600" step="0.1" placeholder="seconds"> <span class="meta">seconds</span>
+        </label>
+      </section>
+
+      <section class="card">
+        <h2><span class="step">2</span> Who goes in</h2>
+        <p class="hint">One image per person is the minimum. Clear, front-facing, well-lit shots work best. Up to 8 images total.</p>
+        <div id="people" class="people"></div>
+        <button id="addPerson" type="button" class="ghost">+ Add image</button>
+      </section>
+
+      <section class="card">
+        <h2><span class="step">3</span> Settings</h2>
+
+        <fieldset class="field">
+          <legend>Model</legend>
+          <div id="models" class="choices"></div>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend>Resolution</legend>
+          <div id="resolutions" class="seg"></div>
+        </fieldset>
+
+        <label class="field">
+          <span class="label">Job name <small>(optional)</small></span>
+          <input id="name" type="text" maxlength="80" placeholder="hotel-lobby-v1">
+        </label>
+
+        <label class="field">
+          <span class="label-row">
+            <span class="label">Prompt</span>
+            <button id="rebuildPrompt" type="button" class="link">Rebuild from descriptions</button>
+          </span>
+          <textarea id="prompt" rows="5" maxlength="10000" placeholder="Replace the man at the front desk with the person in image 1…"></textarea>
+          <small class="hint">Written for you from the “replaces” boxes above. Edit freely.</small>
+        </label>
+      </section>
+
+      <section class="card cost">
+        <div>
+          <div class="cost-label">Estimated cost</div>
+          <div id="costValue" class="cost-value">—</div>
+          <div id="costDetail" class="meta"></div>
+        </div>
+        <button id="generate" type="submit" class="primary" disabled>Generate</button>
+      </section>
+      <p id="formError" class="error" role="alert"></p>
+    </form>
+
+    <aside class="jobs">
+      <h2>Your renders</h2>
+      <div id="jobs"></div>
+    </aside>
+  </main>
+
+  <dialog id="confirm">
+    <form method="dialog">
+      <h3>Spend credits?</h3>
+      <p id="confirmText"></p>
+      <p class="meta">Higgsfield bills per second of input video, rounded up. Failed or moderated jobs are refunded.</p>
+      <div class="dialog-actions">
+        <button value="cancel" class="ghost">Cancel</button>
+        <button value="ok" class="primary">Generate</button>
+      </div>
+    </form>
+  </dialog>
+
+  <template id="personTpl">
+    <div class="person">
+      <label class="thumb">
+        <input type="file" accept="image/jpeg,image/png,image/webp" hidden>
+        <span class="thumb-empty">+ Photo</span>
+        <img alt="" hidden>
+        <span class="tag"></span>
+      </label>
+      <textarea class="replaces" rows="2" placeholder="replaces… e.g. the woman at check-in"></textarea>
+      <button type="button" class="remove" aria-label="Remove image">×</button>
+    </div>
+  </template>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
